@@ -32,8 +32,8 @@
 
                 </div>
                 <div class="layer-actions">
-                    <button class="move-up">Move Up</button>
-                    <button class="move-down">Move Down</button>
+                    <button class="move-up btn-layers">Move Up</button>
+                    <button class="move-down btn-layers">Move Down</button>
                 </div>
 
 
@@ -42,21 +42,36 @@
             <div class="middle-area">
 
             </div>
+            
             <!-- Properties panel -->
             <div class="right-panel">
                 <h3 class="panel-title">Properties</h3>
+
                 <div class="fields">
                     <label>Width</label>
-                    <input type="number">
-                    <label>Height</label>
-                    <input type="number">
-                      <label>Color</label>
-                    <input type="color"><br>
-                    <label>Rotation</label>
-                    <input type="number">
-                </div>
+                    <input class="width" type="number">
 
+                    <label>Height</label>
+                    <input class="height" type="number">
+
+                    <!-- Color Palette -->
+                    <div class="color-palette">
+                        <div class="color-row">
+                            <label>Color</label>
+                            <input class="color" type="color">
+                        </div>
+
+                        <div class="color-row">
+                            <label>Hex</label>
+                            <input class="hex" type="text" placeholder="#ff0000">
+                        </div>
+                    </div>
+
+                    <label>Rotation</label>
+                    <input class="rotation" type="number">
+                </div>
             </div>
+
 
         </div>
     </div>
