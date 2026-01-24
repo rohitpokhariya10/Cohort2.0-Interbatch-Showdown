@@ -50,7 +50,7 @@ addRectangleBtn.addEventListener("click", () => {
 
   rectangle.addEventListener("click", (e) => {
     e.stopPropagation();
-    selectItem(rectangle);//rectangle pe click krte hi rectangle select ho jaye
+    selectItem(rectangle);//rectangle pe click krte hi rectangle select ho jayega
   });
 
   workspace.appendChild(rectangle);
@@ -86,38 +86,57 @@ addTextBtn.addEventListener("click", () => {
 
   textBox.addEventListener("click", (e) => {
     e.stopPropagation();
-    selectItem(textBox);
+    selectItem(textBox);//textBox pe click krte hi textBox selecthojayega
+
+    
   });
 
   workspace.appendChild(textBox);
   nextX += 150 + GAP;//150 value define khudse  kari hai kyunki text box ki koi height width humne define hi nhi kari hai
 });
 
-// CANVAS CLICK → DESELECT hojayega
+// CANVAS  pe CLICK krte hi  DESELECT hojayega
 workspace.addEventListener("click", clearSelection);
+workspace.addEventListener("click", removeResizeHandles);
 
+console.log(selectedElement);
 
 // SELECTION LOGIC
 function selectItem(item) {
-  if (selectedElement) {
+  //  if same element clicked again → deselect
+  if (selectedElement === item) {
     selectedElement.classList.remove("selected");
+    removeResizeHandles(selectedElement);
+    selectedElement = null;
+    return;
   }
 
+  //  if different element selected before → remove old
+  if (selectedElement) {
+    selectedElement.classList.remove("selected");
+    removeResizeHandles(selectedElement);
+  }
+
+  // select new
   selectedElement = item;
   selectedElement.classList.add("selected");
 
-  enableDragging();//jo bhi element selected hoga vohi drag ho sakta hai
+  enableDragging();
   fillProperties();
+  addResizeHandles(selectedElement);
 }
+
 //deselection
 function clearSelection() {
   if (!selectedElement) return;
   selectedElement.classList.remove("selected");
-  selectedElement = null;
+  removeResizeHandles(selectedElement)
+  selectedElement=null
+ 
 }
 
 
-// DRAGGING LOGIC
+// DRAGGING LOGIC(pending)
 function enableDragging() {
   if (!selectedElement) return;
 
@@ -162,6 +181,7 @@ function enableDragging() {
 }
 
 
+//properties pannel easy
 const widthInput = document.querySelector(".width");
 //console.log(widthInput.type);
 const heightInput = document.querySelector(".height");
@@ -208,11 +228,13 @@ function applyProperties() {
 // FILL PROPERTIES ON SELECT
 function fillProperties() {
   if (!selectedElement) return;
-
+  //offsetWidth = element की width (padding + border भी include)
   widthInput.value = selectedElement.offsetWidth;
   heightInput.value = selectedElement.offsetHeight;
 
   const bg = getComputedStyle(selectedElement).backgroundColor;
+  //console.log(bg);//browser es format me color dega ---> rgb(255, 0, 0)
+  //console.log(getComputedStyle(selectedElement));//browser khudse bhi basic style lagata hai element par taki vo dikhe hume
   const hexColor = rgbToHex(bg);
 
   colorInput.value = hexColor;
@@ -221,26 +243,58 @@ function fillProperties() {
   rotationInput.value = 0;
 }
 
-
+//helper function for fillProperties
 function rgbToHex(rgb) {
   if (!rgb || rgb === "transparent") {
     return "#000000"; // default safe color
   }
 
   const result = rgb.match(/\d+/g);
-
+   //kyunki koi bhi color 3 color se hi banta hai (red,blue,green)
   if (!result || result.length < 3) {
     return "#000000";
   }
-
+  //agar 3 se jyada length hai tuh
   return (
     "#" +
     result
-      .slice(0, 3) // 👈 sirf R G B lo, alpha ignore
+      .slice(0, 3) //  sirf R G B lo
+      //parseInt(x) --> string ko Integer me convert krega
+      //toString(16)  ---> Is number ko hexadecimal (base 16) me convert karke string bana do
+      //padStart(2, "0")---> 1 extra 0 jod rhe hai
+
       .map((x) => parseInt(x).toString(16).padStart(2, "0"))
       .join("")
   );
 }
 
-
 applyProperties();
+
+
+
+
+/////////////////////////
+function addResizeHandles(element) {
+  // pehle purane handles hata do (duplicate na bane)
+  removeResizeHandles(element);
+
+  // element ko relative karna zaroori hai
+  // warna handles absolute honge aur bahar chale jayenge
+  //element.style.position = "absolute";
+
+  const corners = ["tl", "tr", "bl", "br"];
+
+  corners.forEach((corner) => {
+    const handle = document.createElement("div");
+    //resize-handle--> base class jo fixed hogi kyunki string me diya hai
+    //corner ---> 4 classes jo ki corner me lagengi string me nhi kyun ki ye runtimr me change hogi
+    handle.classList.add("resize-handle", corner);
+    element.appendChild(handle);
+  });
+}
+function removeResizeHandles(element) {
+  //
+  const handles = document.querySelectorAll(".resize-handle");
+ handles.forEach((h) => h.remove());
+}
+
